@@ -37,7 +37,27 @@
       <input id="graphminy" placeholder="miny" type="text" value="-10">
       <label for="graphmaxy">maxy:</label>
       <input id="graphmaxy" placeholder="maxy" type="text" value="50">
-
+    </div>
+    <br>
+    <div class="hideable" desc="<h4 style='display:inline'>Graph2d </h4>">
+      <canvas id="2dcanvas"></canvas>
+      startx:
+      <input id="graph2dstartx" placeholder="startx" type="text" value="-0.15">
+      endx:
+      <input id="graph2dendx" placeholder="endx" type="text" value="-0.152">
+      starty:
+      <input id="graph2dstarty" placeholder="starty" type="text" value="-0.6490">
+      endy:
+      <input id="graph2dendy" placeholder="endy" type="text" value="-0.6505">
+      rangemin:
+      <input id="graph2drangemin" placeholder="rangemin" type="text" value="0">
+      rangemax:
+      <input id="graph2drangemax" placeholder="rangemax" type="text" value="255">
+      sizex:
+      <input id="graph2dsizex" type="range" value="0.2" min="0" max="1" oninput="updateCanvasSize('2dcanvas','graph2dsizex','graph2dsizey')" step="0.01">
+      sizey:
+      <input id="graph2dsizey" type="range" value="0.2" min="0" max="1" oninput="updateCanvasSize('2dcanvas','graph2dsizex','graph2dsizey')" step="0.01">
+      colourful output:<input type="checkbox" id="graph2doutput">
     </div>
     <br>
     <div class="hideable" desc="<h4 style='display:inline'>Table </h4>">
@@ -88,7 +108,9 @@
       </div>
     </div>
   <footer><a href="https://icons8.com">icons by Icons8</a></footer>
+  <script src="to_js.js"></script>
   <script src="coloureditable.js"></script>
+  <script src="customError.js"></script>
     <script src="Tutorial.js"></script>
     <script src="visualisation.js"></script>
     <script src="useful.js"></script>

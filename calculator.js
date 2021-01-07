@@ -2,6 +2,7 @@
 class Calculator {
   calc(trees) {
     for(let tree of trees){
+      try{
     let nodes = [...tree.nodes]
     let state = 0
     let next_state = true
@@ -24,9 +25,15 @@ class Calculator {
     }
       
       let result=nodes[0].get(this)
-      if(tree.return||trees.length==1){
-    return result
-      }
+      if(tree.return){
+    throw new returnExeption(result)
+      }else if(trees.length==1){
+        return result
+        }
+      }catch(e){
+        console.log("error in this tree",tree,e.stack)
+        throw e
+        }
   }
     }
 }

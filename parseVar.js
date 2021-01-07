@@ -27,6 +27,6 @@ function get_standart_vars(calculator){
   let pi=new ParseVar("pi",3.14159265359)
   let globalCalc=new ParseVar("calculator",calculator)
   
-let vars=[golden,e,G,c,pi,globalCalc].sort((a,b)=>b.name.length-a.name.length)
+let vars=[golden,e,G,c,pi].sort((a,b)=>b.name.length-a.name.length)
 return vars
 }

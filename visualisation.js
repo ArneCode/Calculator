@@ -57,24 +57,31 @@ function dataToTable(table, data, headings = false) {
 }
 
 function genData(functions, calculator, start = 0, stepsize = 1, numsteps = 10) {
+  console.log(functions)
   let end = start + stepsize * numsteps
   let data = []
   for (let f of functions) {
-    let row = [f]
-    for (let x = 0; x < numsteps + 1; x++) {
-      let x_map = x.map(0, numsteps, start, end)
-      if (f.vars.length > 0) {
-        f.vars[0].value = x_map
-      }
-      let result
-      if (f.isF) {
-        result = f.code(x_map)
-      } else {
-        result = calculator.calc(f.code)
-        f.reset()
-      }
-      row.push(result)
+    let row_x = range(start, end, stepsize)
+    let row
+    if (f.isF) {
+      row = row_x.map(v => f.code(v))
+    } else {
+      let parameter = f.vars[0]
+      row = row_x.map(v => {
+        f.reset();
+        parameter.value = v;
+        try {
+          return calculator.calc(f.code)
+        } catch (e) {
+          if (e instanceof returnExeption) {
+            return e.value
+          } else {
+            throw e
+          }
+        }
+      })
     }
+    row.unshift(f)
     data.push(row)
   }
   return data
@@ -168,9 +175,9 @@ function toGraph(data, borderspace, miny, maxy, functions) {
   noFill()
   let _width = width - borderspace
   let _height = height - borderspace
+  let lastGraphed
   for (let row of data) {
     let func = row.shift()
-    let lastGraphed
     stroke(func.r, func.g, func.b)
     beginShape()
     for (let i = 0; i < row.length; i++) {
@@ -186,7 +193,9 @@ function toGraph(data, borderspace, miny, maxy, functions) {
         continue
       }
       vertex(x, y)
+
       lastgraphed = [x, y]
+
     }
     endShape()
     fill(func.r, func.g, func.b)
@@ -201,4 +210,62 @@ function toGraph(data, borderspace, miny, maxy, functions) {
     }
     noFill()
   }
+}
+function gen_2d_data(f,startx,endx,starty,endy,width,height,rangemin,rangemax,outputColourful){
+  //console.log(new Array(arguments))
+  let sizex = (endx - startx) / (width)
+  let sizey = (endy - starty) / (height)
+  let data=[]
+  let i=0
+  for(let y=0;y<height;y+=1){
+    let y_m=y.map(0,height,starty,endy)
+    //console.log(y_m,y)
+  for(let x=0;x<width;x+=1){
+    let x_m=x.map(0,width,startx,endx)
+    
+    let val=f(x_m,y_m)
+    if(outputColourful&&val>0){
+      let rgb=HSVtoRGB(val.map(rangemin,rangemax,0.5,1),1,1)
+      data[i]=rgb.r
+      data[i+1]=rgb.g
+      data[i+2]=rgb.b
+      data[i+3]=255
+      
+      }else{
+        val=val.map(rangemin,rangemax,0,255)
+    data[i]=val
+    data[i+1]=val
+    data[i+2]=val
+    data[i+3]=255
+    }
+    i+=4
+  }
+  }
+  //console.log(data.slice(0,100))
+return data}
+    function updateCanvasSize(canvasid,sizexid,sizeyid){
+      let canvas=document.getElementById(canvasid)
+      let sizex=document.getElementById(sizexid)
+      let sizey=document.getElementById(sizeyid)
+      canvas.width=sizex.value*document.documentElement.clientWidth
+      canvas.height=sizey.value*document.documentElement.clientHeight
+      }
+function show2dFunc(f) {
+  let canvas=document.getElementById("2dcanvas")
+  let startx=Number(document.getElementById("graph2dstartx").value)
+  let starty=Number(document.getElementById("graph2dstarty").value)
+  let endx=Number(document.getElementById("graph2dendx").value)
+  let endy=Number(document.getElementById("graph2dendy").value)
+  let rangemin=Number(document.getElementById("graph2drangemin").value)
+  let rangemax=Number(document.getElementById("graph2drangemax").value)
+  let outputColourful=document.getElementById("graph2doutput").checked
+  let width=canvas.width
+  let height = canvas.height
+  
+  let arr=gen_2d_data(f,startx,endx,starty,endy,width,height,rangemin,rangemax,outputColourful)
+  //console.log(width,height,arr.length,width*height*4)
+  let ctx=canvas.getContext("2d")
+  let idata=ctx.createImageData(width,height)
+  idata.data.set(new Uint8ClampedArray(arr))
+  ctx.putImageData(idata,0,0)
 }

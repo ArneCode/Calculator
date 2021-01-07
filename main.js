@@ -7,8 +7,8 @@ let operands = [
   [Dot, Div, Mod],
   [Plus, Minus],
   [GrEq, LessEq, Less, Gr, Eq, NEq],
-  [AND, OR,XOR],
-  [SETPLUS,SETMINUS,SETDOT,SETDIV,SET]
+  [AND, OR, XOR],
+  [SETPLUS, SETMINUS, SETDOT, SETDIV, SET]
 ]
 let parser = new Parser(operands)
 
@@ -18,9 +18,9 @@ let standart_functions = gen_standart_funcs(parser)
 let user_functions = []
 
 let allfuncs = () => user_functions.concat(standart_functions)
-let allfuncs_sorted=()=>allfuncs().sort((a,b)=>b.name.length-a.name.length)
+let allfuncs_sorted = () => allfuncs().sort((a, b) => b.name.length - a.name.length)
 let allvars = () => user_variables.concat(standart_variables)
-let allvars_sorted=()=>allvars().sort((a,b)=>b.name.length-a.name.length)
+let allvars_sorted = () => allvars().sort((a, b) => b.name.length - a.name.length)
 
 let calcInput = document.getElementById("calcinput")
 let calcInputForm = document.getElementById("calcinputform")
@@ -30,8 +30,11 @@ let calcOutputUp = document.getElementById("calcoutputup")
 
 calcOutput.style.display = "none"
 
-let autoElements=[{elt:calcInput,output:calcTextOutput}]
-enableAutoCalc(calculator,parser,autoElements)
+let autoElements = [{
+  elt: calcInput,
+  output: calcTextOutput
+}]
+enableAutoCalc(calculator, parser, autoElements)
 
 function runcalc(event) {
   tableFuncs = []
@@ -44,19 +47,24 @@ function runcalc(event) {
   try {
     inputParsed = parser.parse(input, allvars_sorted(), allfuncs_sorted())
   } catch (e) {
-    console.log(e.stack)
+    console.log(e.stack, e)
     alert("Error occured while parsing input.\nError:" + e.stack)
     return
   }
   console.log("parsed", inputParsed)
-  try {
-    output = calculator.calc(inputParsed)
-  } catch (e) {
-    console.log(e.stack)
-    
-    alert("Error occured while running calculation.\nError:" + e.stack)
-    return
-  }
+  output = window.Function(instruct_to_js(inputParsed))()
+  /* try {
+     output = calculator.calc(inputParsed)
+   } catch (e) {
+     if(e instanceof returnExeption){
+       output=e.value
+       }
+     else{
+     console.log(e.stack)
+     
+     alert("Error occured while running calculation.\nError:" + e.stack)
+     return
+   }}*/
   calcOutput.style.display = "inline"
   calcTextOutput.innerHTML = output
   console.log("calculation outputed", output)
@@ -67,7 +75,10 @@ calcInputForm.onsubmit = runcalc
 
 function outputUp() {
   calcInput.innerText = calcTextOutput.innerHTML
-  let event = new Event('input', { bubbles: true, cancelable: true, });
+  let event = new Event('input', {
+    bubbles: true,
+    cancelable: true,
+  });
   calcInput.dispatchEvent(event)
   calcOutput.style.display = "none"
   calcTextOutput.innerHTML = ""
@@ -86,11 +97,11 @@ function addFunc() {
   let vars = funcvarsInp.value
   let code = funccodeInp.value
   let func
-  try{
-  func= new ParseFunc(name, code, vars, parser,"", [allvars_sorted(), allfuncs_sorted()],true)
-  }catch(e){
+  try {
+    func = new ParseFunc(name, code, vars, parser, "", [allvars_sorted(), allfuncs_sorted()], true)
+  } catch (e) {
     console.log(e.stack)
-    
+
     alert("Error occured while compiling function.\nError:" + e.stack)
   }
   user_functions.unshift(func)
@@ -144,7 +155,7 @@ function showVarTable() {
   let heading = genHeading(start, stepsize, numsteps)
   dataToTable(funcOutTable, data, heading)
 }
-let tableFunc = new ParseFunc("table", addTableFunc, "func",null,"stellt die funktion(en) unter Visualisation/Table als Tabelle dar")
+let tableFunc = new ParseFunc("table", addTableFunc, "func", null, "stellt die funktion(en) unter Visualisation/Table als Tabelle dar")
 standart_functions.push(tableFunc)
 
 let funcsFile = document.getElementById("funcsfile")
@@ -200,10 +211,13 @@ let canavas = document.getElementById("canavas")
 canavas.style.display = "none"
 
 function updateGraph() {
+
+
   if (graphFuncs.length == 0) {
     return
   }
   canavas.style.display = "block"
+  resizeCanvas(windowWidth, windowHeight / 2)
   background(255)
   let start = Number(graphStart.value)
   let stepsize = Number(graphStepSize.value)
@@ -215,24 +229,24 @@ function updateGraph() {
 
   let generate_start = millis()
   let data
-  try{
-  data = genData(graphFuncs, calculator, start, stepsize, numsteps)
-  }catch(e){
+  try {
+    data = genData(graphFuncs, calculator, start, stepsize, numsteps)
+  } catch (e) {
     console.log(e.stack)
-    
-    alert("Error occured while generating data for graph.\nError:" + e.stack)
-    }
+
+    alert("Error occured while generating data for graph.\nError:" + e.stack + " " + e.lineNumber)
+  }
   let generate_end = millis()
-  //log_console.innerHTML = "generating Data took: " + str((generate_end - generate_start) / 1000) + "s"
-  try{
-  toGraph(data, borderspace, miny, maxy)
-  graphBorderText(start, end, miny, maxy, borderspace)
-    }
-    catch(e){
+  alert(generate_end - generate_start)
+  log_console.innerHTML = "generating Data took: " + str((generate_end - generate_start) / 1000) + "s"
+  try {
+    toGraph(data, borderspace, miny, maxy)
+    graphBorderText(start, end, miny, maxy, borderspace)
+  } catch (e) {
     console.log(e.stack)
-      
-    alert("Error occured while graphing data.\nError:" + e.stack)
-    }
+
+    alert("Error occured while graphing data.\nError:" + e.stack + " " + e.lineNumber)
+  }
   graphFuncs = []
 }
 
@@ -241,7 +255,28 @@ function addGraphFunc() {
     graphFuncs.push(f)
   }
 }
-standart_functions.push(new ParseFunc("graph", addGraphFunc, "func",null,"stellt die funktion(en) unter Visualisation/Graph als Graph dar"))
+let picFunc = null
+
+function setPicFunc(f) {
+  picFunc = f.code
+}
+
+function updatePic() {
+  if (picFunc == null) {
+    return
+  }
+  try {
+    show2dFunc(picFunc)
+    canavas.style.display = "block"
+    picFunc = null
+  } catch (e) {
+    alert(e.stack)
+
+  }
+}
+standart_functions.push(new ParseFunc("graph", addGraphFunc, "func", null, "stellt die funktion(en) unter Visualisation/Graph als Graph dar"))
+standart_functions.push(new ParseFunc("picture", setPicFunc, "func", null, "stellt die funktion unter Visualisation/Graph als Bild dar"))
+
 let varTable = document.getElementById("vartable")
 update_vartable(varTable, allvars())
 
@@ -249,12 +284,12 @@ let addVarForm = document.getElementById("addvarform")
 let addVarName = document.getElementById("varnameinp")
 let addVarVal = document.getElementById("varvalinp")
 let rangeinp_locked = false
-let curr_editing=null
+let curr_editing = null
 let varRangeMin = document.getElementById("varrangemin")
 let varRangeMax = document.getElementById("varrangemax")
 let varRangeStep = document.getElementById("varrangestep")
 addVarForm.onsubmit = addVar
-  
+
 function addVar(event) {
   event.preventDefault()
   let name = addVarName.value
@@ -263,26 +298,26 @@ function addVar(event) {
   let max = Number(varRangeMax.value)
   let step = Number(varRangeStep.value)
   let variable
-  if(curr_editing){
-    variable=curr_editing
-    variable.name=name
-    variable.value=value
-    variable.norm=value
-    variable.isUserFunc=true
-    variable.min=min
-    variable.max=max
-    variable.step=step
-    curr_editing=null
-  }else{
-  variable = new ParseVar(name, value, value, true, min, max, step)
+  if (curr_editing) {
+    variable = curr_editing
+    variable.name = name
+    variable.value = value
+    variable.norm = value
+    variable.isUserFunc = true
+    variable.min = min
+    variable.max = max
+    variable.step = step
+    curr_editing = null
+  } else {
+    variable = new ParseVar(name, value, value, true, min, max, step)
   }
   user_variables.push(variable)
   update_vartable(varTable, allvars())
   addVarName.value = addVarVal.value = ""
   rangeinp_locked = false
-  varRangeMin.value=""
-  varRangeStep.value=""
-  varRangeMax.value=""
+  varRangeMin.value = ""
+  varRangeStep.value = ""
+  varRangeMax.value = ""
 }
 
 function edit_user_var(i) {
@@ -290,7 +325,7 @@ function edit_user_var(i) {
   addVarName.value = v.name
   addVarVal.value = v.value
   update_vartable(varTable, allvars())
-  curr_editing=v
+  curr_editing = v
 }
 
 function delete_user_var(i) {
@@ -334,6 +369,7 @@ function gen_var_range(value) {
 function lock_var_range() {
   rangeinp_locked = true
 }
-let fib = new ParseFunc("fib", "round(($golden^$n-((-1/$golden)^$n))/5^0.5)", "n", parser,"", [allvars_sorted(), allfuncs_sorted()])
+let fib = new ParseFunc("fib", "round(($golden^$n-((-1/$golden)^$n))/5^0.5)", "n", parser, "", [allvars_sorted(), allfuncs_sorted()])
 standart_functions.push(fib)
+  
 update_functable("functable", allfuncs())

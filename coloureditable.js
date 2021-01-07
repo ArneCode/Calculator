@@ -10,25 +10,30 @@ function addToColour(elt){
   if(!to_colour.includes(elt))
   to_colour.push(elt)
   }
-function colorUpdate(){
+function colorUpdate(dotimeout){
   //console.log(to_colour)
   for(let elt of to_colour){
   setTextColors.bind(elt)(null,true)
     }
   to_colour=[]
-window.requestAnimationFrame(colorUpdate)
-  
+  if(dotimeout){
+setTimeout(colorUpdate,20,true)
   }
-window.requestAnimationFrame(colorUpdate)
+  }
+setInterval(colorUpdate,100,false)
 
-colorUpdate()
+colorUpdate(true)
 function setTextColors(evt,withCaret=true) {
   withCaret=withCaret&&document.activeElement==this //checks wether element is focused
   let chars = []
   let text = this.innerText
   let caretPos
   if(withCaret){
-  caretPos=getCaretPos(this)
+    try{
+  caretPos=getCaretPos(this)}
+    catch(e){
+      withCaret=false
+      }
     }
   let stringList=[]
   let bracketList=[]
@@ -36,7 +41,7 @@ function setTextColors(evt,withCaret=true) {
     let numrx = RegExp(/(\+|\-)?(\d+(\.\d+)?(e(\+|\-)\d+)?|Infinity|true|false)/gm)
   let operrx=RegExp(/([\+\-\/%=<>]|\*|\^|xor)/g)
   let stringrx=RegExp(/("[^"]*"?)/g)
-  let specialrx=RegExp(/(if|else|let|for|while|function|return)/g)
+  let specialrx=RegExp(/(?<!\w)(if|else|let|for|while|function|return)(?!\w)/g)
   let varrx=RegExp(/\$[a-z]+\w*/gi)
   let bracketrx=RegExp(/(\([^(){}]*\)|{[^(){}]*})/gm)
   let funcrx=RegExp(/([a-z]\w*(?=\()|(?<=@)[a-z]\w*)/gi)
@@ -48,7 +53,7 @@ function setTextColors(evt,withCaret=true) {
   text = text.replace(specialrx, replaceColour.bind({color: "purple"}))
   text = text.replace(varrx, replaceColour.bind({color: "red"}))
   text = text.replace(funcrx, replaceColour.bind({color: "cornflowerblue"}))
-  text = text.replace("@", replaceColour.bind({color: "orange"}))
+  text = text.replace(/@/g, replaceColour.bind({color: "orange"}))
   
   while(bracketrx.test(text)){
   text=text.replace(bracketrx,replaceBracket.bind({bracketList}))
