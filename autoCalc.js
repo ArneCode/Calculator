@@ -8,7 +8,7 @@ function enableAutoCalc(calculator,parser,elements){
       to_calc.push(this)
       }
     }
-  let notcalcablerx=RegExp(/\w+\(/i)
+  let notcalcablerx=RegExp(/[a-z]\w*\(/i)
   function autoCalc(){
     if(to_calc!=[]){
       for(let element of to_calc){
@@ -19,7 +19,7 @@ function enableAutoCalc(calculator,parser,elements){
           parsed=parser.parse(text)
           result=calculator.calc(parsed)
           }catch(e){
-            
+            result=undefined
             }
           element.output.innerHTML=result
           element.output.style.display="inline"
@@ -30,5 +30,5 @@ function enableAutoCalc(calculator,parser,elements){
       to_calc=[]
       }
     }
-  setInterval(autoCalc,1000)
+  setInterval(autoCalc,100)
   }

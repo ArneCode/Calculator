@@ -1,7 +1,7 @@
 //Die Struktur für den compilierten Code
 
 class ParseTree {
-  constructor(parsed, vals, groups, vars, operands, funcs, ifElses, forLoops, whileLoops, emptyfuncs) {
+  constructor(parsed, vals, groups, vars, operands, funcs, ifElses, forLoops, whileLoops, emptyfuncs, arrays) {
     this.nodes = []
     this.vals = vals
     this.vars = vars
@@ -11,7 +11,9 @@ class ParseTree {
     this.ifElses = ifElses
     this.forLoops = forLoops
     this.whileLoops = whileLoops
+    this.arrays = arrays
     this.return = false
+    this.emptyfuncs=emptyfuncs
     let pnode = null //previous node
     for (let i in parsed) {
       let e = parsed[i]
@@ -44,10 +46,11 @@ class ParseTree {
         node = new ParseNode(type, ref, poss)
       } else if (type == "for") {
         node = new ParseNode(type, ref, forLoops)
-      } else if(type=="while"){
-        node=new ParseNode(type,ref,whileLoops)
-        }
-        else {
+      } else if (type == "while") {
+        node = new ParseNode(type, ref, whileLoops)
+      } else if (type == "while") {
+        node = new ParseNode(type, ref, arrays)
+      } else {
         node = new ParseNode(type, ref, vals)
       }
       if (pnode && pnode.type != "op" && node.type != "op") {
@@ -107,53 +110,116 @@ class ParseNode {
       this.cond = this.val.cond
       this.aug = this.val.aug
       this.instructions = this.val.instructions
-    }else if(this.type=="while"){
-    this.cond=this.val.cond
-      this.instructions=this.val.instructions
+    } else if (this.type == "while") {
+      this.cond = this.val.cond
+      this.instructions = this.val.instructions
     }
-  }
-  get(calculator = null) {
+    this.defineGet()
+}
+    //how to get value from Node:
+    //defining get function differently every time for speed optimization, so that while calculating less if statements are needed and used
+defineGet(){
     if (this.type.isOf(["d", "point"])) {
-      return this.val
+      this.get = function() {
+        return this.val
+      }
     } else if (this.type == "g") {
-      return calculator.calc(this.val)
+      this.get = function(calculator) {
+        return calculator.calc(this.val)
+      }
     } else if (this.type == "var") {
-      return this.val.value
+      this.get = function() {
+        return this.val.value
+      }
     } else if (this.type == "func") {
-      let num_vars = []
-      if (this.func.vars.length > 0) {
-        for (let i in this.vars) {
-          if (this.func.isF) {
+
+      if (this.func.isF) {
+
+        this.getnumVars = function(calculator) {
+          let num_vars = []
+          for (let i in this.vars) {
             num_vars.push(calculator.calc(this.vars[i]))
-          } else {
+          }
+          /*else {
+                     this.func.vars[i].value = calculator.calc(this.vars[i])
+                   }*/
+          return num_vars
+
+        }
+        if (this.func.vars.length > 0 && this.vars.length > 0) {
+          this.getResult = function(num_vars) {
+            return this.func.code.apply(null, num_vars)
+          }
+        } else {
+          this.getResult = function() {
+            return this.func.code()
+
+          }
+        }
+
+      } else {
+        this.getnumVars = function(calculator) {
+          for (let i in this.vars) {
             this.func.vars[i].value = calculator.calc(this.vars[i])
           }
         }
+        this.getResult = function(calculator) {
+          let result
+          try {
+            result = calculator.calc(this.func.code)
+          } catch (e) {
+            if (e instanceof returnExeption) {
+              result = e.value
+            } else {
+              throw e
+            }
+          }
+          return result
+        }
       }
-      let result
-      if (this.func.isF) {
-        result = this.func.code.apply(null, num_vars)
+      if (this.func.vars.length > 0 && this.vars.length > 0) {
+        if (this.func.isF) {
+          this.get = function(calculator) {
+            let numvars = this.getnumVars(calculator)
+            return this.getResult(numvars)
+          }
+        } else {
+          this.get = function(calculator) {
+            this.getnumVars(calculator)
+            return this.getResult(calculator)
+            this.func.reset()
+
+          }
+        }
       } else {
-        result = calculator.calc(this.func.code)
+        if (this.func.isF) {
+          return this.getResult()
+        } else {
+          return this.getResult(calculator)
+        }
       }
-      this.func.reset()
-      return result
     } else if (this.type == "ifelse") {
-      if (calculator.calc(this.condition)) {
-        return calculator.calc(this.thenBlock)
-      } else {
-        return calculator.calc(this.elseBlock)
+      this.get = function(calculator) {
+        if (calculator.calc(this.condition)) {
+          return calculator.calc(this.thenBlock)
+        } else {
+          return calculator.calc(this.elseBlock)
+        }
       }
     } else if (this.type == "for") {
-      calculator.calc(this.start)
-      while (calculator.calc(this.cond)) {
-        calculator.calc(this.instructions)
-        calculator.calc(this.aug)
+      this.get = function(calculator) {
+        calculator.calc(this.start)
+        while (calculator.calc(this.cond)) {
+          calculator.calc(this.instructions)
+          calculator.calc(this.aug)
+        }
       }
-    }else if(this.type=="while"){
-    while(calculator.calc(this.cond)){
-    calculator.calc(this.instructions)
-    }
+    } else if (this.type == "while") {
+      this.get = function(calculator) {
+        while (calculator.calc(this.cond)) {
+          calculator.calc(this.instructions)
+        }
+      }
     }
   }
 }

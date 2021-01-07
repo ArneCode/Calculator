@@ -7,13 +7,14 @@ class Parser {
     this.varrx = RegExp(/\$[a-z]+\w*/gim)
     this.funcrx = RegExp(/[a-z]+\w*[\t ]*\(.*\)/gim)
     this.varfuncrx = RegExp(/(\$\w|\w[ \t]*\()/im)
-    this.ifElserx = RegExp(/if[ \t]*\(.*\)\s*\{(\s|.)*\}(\s*else\{(\s|.)*\})?/m)
+    this.ifElserx = RegExp(/if[ \t]*\(.*\)\s*\{(\s|.)*\}(\s*else\{(\s|.)*\})?/gm)
     this.boolrx = RegExp(/(true|false)/gm)
     this.pointerrx = RegExp(/@\$?[a-z]+\w*/gim)
     this.newFuncrx = RegExp(/function\s+[a-z]*[ \t]*\(.*\)\s*\{(\s|.)*\}/gmi)
     this.newVarrx=RegExp(/let\s*\$[a-z]+/gmi)
     this.forLooprx=RegExp(/for[ \t]*\(.*;.*;.*\)\s*\{(\s|.)*\}/gmi)
     this.whileLooprx=RegExp(/while[\t ]*\(.*\)\s*\{(\s|.)*\}/gmi)
+    this.arrayrx=RegExp(/(?<!\w)\[[^[]]\]/g)
     this.operands = operands
     this.vals = []
     this.groups = []
@@ -21,6 +22,7 @@ class Parser {
     this.ifElses = []
     this.forLoops=[]
     this.whileLoops=[]
+    this.arrays=[]
   }
   replaceNum(match) {
     let num = Number(match)
@@ -47,11 +49,9 @@ class Parser {
     let newParser = this.newParser
     let parsed = this.parse(content, this.variables, this.emptyfuncs, true)
     this.groups.push(parsed)
-    //alert(this.groups)
     return result
   }
   replaceVar(match) {
-    //alert("var,"+match)
     match = match.slice(1)
     let index
     for (let i in this.variables) {
@@ -61,7 +61,7 @@ class Parser {
       }
     }
     if (index == undefined) {
-      throw ("no such variable as " + match)
+      throw Error("no such variable as " + match)
     }
     let result = `&var~${numToAlpha(index)} `
     return result
@@ -78,19 +78,23 @@ class Parser {
     }
     if (func) {
       let paramEnd = match.searchForCorres("(", ")")
-      let params = match.slice(paramStart + 1, paramEnd).split(",")
+      let params = match.slice(paramStart + 1, paramEnd)
+    params=params.replace(this.funcrx,this.replaceFunc.bind(this))
       let paramsParsed = []
+      
+      if(params!=""){
+      params=params.split(",")
       for (let p of params) {
         paramsParsed.push(this.parse(p, this.variables, this.emptyfuncs))
       }
-
+}
       let result = `&func~${numToAlpha(this.funcs.length)}` + match.substr(paramEnd + 1)
 
       this.funcs.push([func, paramsParsed])
 
       return result
     } else {
-      throw ("no such function as: " + name)
+      throw Error("no such function as: " + name)
       return "&error"
     }
   }
@@ -135,7 +139,7 @@ class Parser {
         let result = `&point~${numToAlpha(index)}~var `
         return result
       } else {
-        throw "no such variable as " + match
+        throw Error("no such variable as " + match)
       }
     } else {
       let index
@@ -149,7 +153,7 @@ class Parser {
         let result = `&point~${numToAlpha(index)}~func `
         return result
       } else {
-        throw "no such function as" + match
+        throw Error("no such function as" + match)
       }
     }
   }
@@ -164,8 +168,11 @@ class Parser {
     let code=match.slice(firstCurlBrack+1,lastCurlBrack)
     
     let newParser = this.newParser
-    let newFunc=new ParseFunc(name,code,vars,newParser)
+    
+    let newFunc=new ParseFunc(name,code,vars,newParser,"",[this.variables,this.emptyfuncs])
+    
     this.emptyfuncs.push(newFunc)
+    
     return "0"+match.slice(lastCurlBrack+1)
   }
   replaceNewVar(match){
@@ -201,17 +208,27 @@ class Parser {
     this.whileLoops.push({cond,instructions})
     return result
     }
+  replaceArray(match){
+    let result=`&arr~${numToAlpha(this.arrays.length)} `
+    let elts=match.slice(1,-1).split(",").map(this.parse)
+    this.arrays.push(elts)
+    return result
+    }
   extract(rechnung, parsenums = true) {
     rechnung = rechnung.replace(this.strrx, this.replaceStr.bind(this))
+    rechnung = rechnung.replace(this.newFuncrx, this.replaceNewFunc.bind(this))
+    
     rechnung = rechnung.replace(this.newVarrx, this.replaceNewVar.bind(this))
-
-    rechnung = rechnung.replace(this.ifElserx, this.replaceIfElse.bind(this))
+    while(this.ifElserx.test(rechnung)){
+    rechnung = rechnung.replace(this.ifElserx, this.replaceIfElse.bind(this))}
     rechnung = rechnung.replace(this.forLooprx, this.replaceFor.bind(this))
     rechnung = rechnung.replace(this.whileLooprx, this.replaceWhile.bind(this))
-    rechnung = rechnung.replace(this.newFuncrx, this.replaceNewFunc.bind(this))
+   /* while(this.arrayrx.test(rechnung)){
+      rechnung=rechnung.replace(this.arrayrx,this.replaceArray.bind(this))
+      }*/
     rechnung = rechnung.replace(this.pointerrx, this.replacePointer.bind(this))
+    
     while (this.varfuncrx.test(rechnung)) {
-      //alert(rechnung)
       rechnung = rechnung.replace(this.funcrx, this.replaceFunc.bind(this))
       rechnung = rechnung.replace(this.varrx, this.replaceVar.bind(this))
     }
@@ -245,12 +262,14 @@ class Parser {
     for(let line of extracted)
     {
       let instructions=line.split("&").filter(instruction=>instruction!="")
-    trees.push(new ParseTree(instructions, this.vals, this.groups, this.variables, this.operands, this.funcs, this.ifElses, this.forLoops, this.whileLoops, this.emptyfuncs))
+    trees.push(new ParseTree(instructions, this.vals, this.groups, this.variables, this.operands, this.funcs, this.ifElses, this.forLoops, this.whileLoops, this.emptyfuncs,this.arrays))
     }
     return trees
   }
   get newParser(){
-    let newParser = Object.assign(new Parser(), this)    
+    let newParser = Object.assign(new Parser(), this)
+    newParser.variables=[...this.variables]
+    newParser.emptyfuncs=[...this.emptyfuncs]
     return newParser
     }
   reset() {

@@ -34,10 +34,12 @@ textarea {
 div {
   word-wrap: break-word
 }
-pre{
-  border:1px solid grey;
-  border-radius:2px;
-  }
+
+pre {
+  border: 1px solid grey;
+  border-radius: 2px;
+}
+
 #graphdiv,
 #graphcontainer {
   padding: 0px;
@@ -46,10 +48,11 @@ pre{
 
 #calcinput {
   display: inline-block;
-  width: 50%;
-  height: 3em;
-  border:1px solid grey;
-  border-radius:2px;
+  width: 70%;
+  height: auto;
+  min-height:5em;
+  border: 1px solid grey;
+  border-radius: 2px;
   font-size: 20pt;
 }
 
@@ -126,11 +129,11 @@ footer {
   border: none;
   cursor: pointer;
   overflow: hidden;
-  position: absolute;
+  position: fixed;
   display: inline;
   padding: 0px;
   margin: 0px;
-  top: 0%;
+  top: 20px;
 }
 
 .coloureditable {
@@ -140,12 +143,22 @@ footer {
 
 .coloureditable:empty:before {
   content: attr(placeholder);
-  color:grey;
+  color: grey;
 }
-#funccodeinp{
-font-size:17px;
+
+#funccodeinp {
+  font-size: 17px;
   height: 3em;
-  border:1px solid grey;
-  border-radius:2px;
-  
+  border: 1px solid grey;
+  border-radius: 2px;
+
+}
+
+pre {
+  overflow-x: auto;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
 }
