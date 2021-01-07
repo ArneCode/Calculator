@@ -275,7 +275,7 @@ function updatePic() {
   }
 }
 standart_functions.push(new ParseFunc("graph", addGraphFunc, "func", null, "stellt die funktion(en) unter Visualisation/Graph als Graph dar"))
-standart_functions.push(new ParseFunc("picture", setPicFunc, "func", null, "stellt die funktion unter Visualisation/Graph als Bild dar"))
+//standart_functions.push(new ParseFunc("picture", setPicFunc, "func", null, "stellt die funktion unter Visualisation/Graph als Bild dar"))
 
 let varTable = document.getElementById("vartable")
 update_vartable(varTable, allvars())
