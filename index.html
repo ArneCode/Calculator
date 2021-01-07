@@ -1,29 +1,33 @@
-<!DOCTYPE html><html lang="en"><head>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
   <title>Calculator</title>
-  <link rel="icon" href="https://img.icons8.com/ios/64/000000/calculator.png" type="image/icon type">
-  <script src="p5.js"></script>
-  <script src="p5.sound.min.js"></script>
-    <script async="" src="visits?callback=updateCount"></script>
+  <link rel="icon" href="https://img.icons8.com/ios/64/000000/calculator.png" type="image/icon type"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.10.2/p5.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.10.2/addons/p5.sound.min.js"></script>
+    <script async src="https://api.countapi.xyz/hit/CalculatorByArne/visits?callback=updateCount"></script>
   
   <link rel="stylesheet" type="text/css" href="style.css">
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
 
 </head>
 
 <body>
-  <button id="tutorialbutton"><strong>Anleitung</strong></button>
+  <button id="tutorialbutton" ><strong>Anleitung</strong></button>
   <span id="console"></span>
   <form id="calcinputform">
     <pre id="calcinput" class="coloureditable" placeholder="calculation" contenteditable="true" oninput="addToColour(this)">1+1</pre>
-    <button type="submit" id="button" value="calculate" class="hiddenbutton"><img src="https://img.icons8.com/ios/100/000000/calculate.png" style="width:60px;height:60px"><strong>Calculate</strong></button>
+    <button type="submit" id="button" value="calculate" class="hiddenbutton"><img src="https://img.icons8.com/ios/100/000000/calculate.png" style="width:60px;height:60px"/><strong>Calculate</strong></button>
 
-    <br>
+    <br />
     <h2 id="calcoutput">
       <span id="calctextoutput"></span>
       <a id="calcoutputup" title="puts output of calculation in input field">↑</a>
     </h2>
   </form>
-  <br>
+  <br />
   <div class="hideable" desc="<h3 style='display:inline'>Visualisation </h3>">
     <div class="hideable" desc="<h4 style='display:inline'>Grahp </h4>">
       <span id="canavas"></span>
@@ -38,7 +42,7 @@
       <label for="graphmaxy">maxy:</label>
       <input id="graphmaxy" placeholder="maxy" type="text" value="50">
     </div>
-    <br>
+    <br />
     <div class="hideable" desc="<h4 style='display:inline'>Graph2d </h4>">
       <canvas id="2dcanvas"></canvas>
       startx:
@@ -59,7 +63,7 @@
       <input id="graph2dsizey" type="range" value="0.2" min="0" max="1" oninput="updateCanvasSize('2dcanvas','graph2dsizex','graph2dsizey')" step="0.01">
       colourful output:<input type="checkbox" id="graph2doutput">
     </div>
-    <br>
+    <br/>
     <div class="hideable" desc="<h4 style='display:inline'>Table </h4>">
       <table id="funcouttable"></table>
       start:
@@ -70,36 +74,36 @@
       <input id="tablenumsteps" placeholder="num steps of table" type="text" value="10">
     </div>
   </div>
-  <br>
+  <br />
   <div class="hideable" desc="<h3 style='display:inline'>Variables </h3>">
   <div class="hideable" desc="<h4 style='display:inline'>create new Variable </h4>">
     <form id="addvarform">
     <input id="varnameinp" placeholder="name">
     <input id="varvalinp" type="text" placeholder="value" oninput="gen_var_range(Number(this.value))" step="0.00000001">
     <button type="submit">add Variable</button>
-      <br>
+      <br/>
       range:<input type="text" step="0.00000001" placeholder="min" onchange="lock_var_range()" id="varrangemin">
       <input type="text" placeholder="max" onchange="lock_var_range()" id="varrangemax" step="0.00000001">
       <input type="text" placeholder="step" onchange="lock_var_range()" id="varrangestep" step="0.00000001">
       
       </form>
     </div>
-    <br>
+    <br/>
   <div class="hideable" desc="<h4 style='display:inline'>existing Variables </h4>">
     <table id="vartable"></table>
     </div></div>
-    <div>
-    <br>
+    <div />
+    <br />
     <div class="hideable" desc="<h3 style='display:inline'>functions </h3>">
       <div class="createfuncdiv hideable" desc="<h4 style='display:inline'>create new function:</h4>">
         <input id="funcnameinp" placeholder="name">
-        <br>
+        <br />
         <input id="funcvarsinp" placeholder="variables">
-        <br>
-        <pre id="funccodeinp" placeholder="function code" contenteditable="true" class="coloureditable" oninput="setTextColors.bind(this)()"></pre>
+        <br />
+        <pre id="funccodeinp" placeholder="function code" contenteditable="true" class="coloureditable"  oninput="setTextColors.bind(this)()"></pre>
         <button id="funcsubmit">add function</button>
       </div>
-      <br>
+      <br />
       <div class="hideable" desc="<h4 style='display:inline'>existing functions:</h4>">
         <button onclick="saveFuncs()">save functions</button>
         load Functions:
@@ -125,6 +129,6 @@
     <script src="hideable.js"></script>
     <script src="sketch.js"></script>
     <script src="main.js"></script>
+</body>
 
-
-</div></body></html>
+</html>
