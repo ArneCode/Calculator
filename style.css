@@ -1,0 +1,151 @@
+button {
+  border-radius: 2px;
+}
+
+html,
+body {
+  color: #2232a5;
+}
+
+canvas {
+  display: block;
+  border: 1px solid black;
+  margin: 0px;
+  padding: 0px;
+}
+
+td,
+th {
+  border: 1px solid #dddddd;
+  text-align: center;
+  padding: 5px;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  padding-bottom: 10px;
+}
+
+textarea {
+  display: block;
+}
+
+div {
+  word-wrap: break-word
+}
+pre{
+  border:1px solid grey;
+  border-radius:2px;
+  }
+#graphdiv,
+#graphcontainer {
+  padding: 0px;
+  margin: 0px;
+}
+
+#calcinput {
+  display: inline-block;
+  width: 50%;
+  height: 3em;
+  border:1px solid grey;
+  border-radius:2px;
+  font-size: 20pt;
+}
+
+#button {
+  margin: 10px;
+}
+
+#outputUp {
+  font-weight: 900;
+}
+
+#calctextoutput {
+  margin: 0px;
+}
+
+#outputUp {
+  margin: 10px;
+  border-radius: 5px;
+
+}
+
+#outputUp:hover {
+  cursor: pointer;
+  color: #dddddd;
+  background-color: grey;
+  /*background-color:lightgray;*/
+}
+
+#calctable {
+  width: auto;
+}
+
+.offset {
+  position: relative;
+  left: 13px;
+}
+
+#console {
+  background-color: white;
+  color: black;
+  position: fixed;
+  left: 80%;
+}
+
+#tutorialbutton {
+  margin-bottom: 10px;
+  font-size: 20px;
+  border-radius: 5px;
+  position: fixed;
+  right: 10%;
+}
+
+.custom_button {
+  padding: 6px;
+  border-radius: 5px;
+  border-size: 1px;
+}
+
+.footer,
+footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  color: black;
+  text-align: center;
+  font-size: 10px;
+  border: 1px solid black;
+}
+
+.hiddenbutton {
+  background-color: Transparent;
+  background-repeat: no-repeat;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  position: absolute;
+  display: inline;
+  padding: 0px;
+  margin: 0px;
+  top: 0%;
+}
+
+.coloureditable {
+  border: 1px solid white;
+  color: grey;
+}
+
+.coloureditable:empty:before {
+  content: attr(placeholder);
+  color:grey;
+}
+#funccodeinp{
+font-size:17px;
+  height: 3em;
+  border:1px solid grey;
+  border-radius:2px;
+  
+}
