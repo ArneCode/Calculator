@@ -1,15 +1,20 @@
 //Operanden
 class Operand {
-  constructor(sign, action) {
+  constructor(sign, action, string=null) {
     this.sign = sign
     this.operate = action
+    if(string){
+      this.string=string
+      }else{
+      this.string=this.sign.source.replace(/\\/g,"")
+      }
   }
 }
 const Plus = new Operand(/\+/g, (a, b) => a + b)
 const Minus = new Operand(/\-/g, (a, b) => a - b)
 const Dot = new Operand(/\*/g, (a, b) => a * b)
 const Div = new Operand(/\//g, (a, b) => a / b)
-const Pow = new Operand(/(\^|\*\*)/g, (a, b) => a ** b)
+const Pow = new Operand(/\^/g, (a, b) => a ** b)
 const Mod = new Operand(/%/g, (a, b) => a % b)
 const GrEq = new Operand(/>=/g, (a, b) => a >= b)
 const LessEq = new Operand(/<=/g, (a, b) => a <= b)
