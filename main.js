@@ -237,7 +237,7 @@ function updateGraph() {
     alert("Error occured while generating data for graph.\nError:" + e.stack + " " + e.lineNumber)
   }
   let generate_end = millis()
-  alert(generate_end - generate_start)
+  //alert(generate_end - generate_start)
   log_console.innerHTML = "generating Data took: " + str((generate_end - generate_start) / 1000) + "s"
   try {
     toGraph(data, borderspace, miny, maxy)
